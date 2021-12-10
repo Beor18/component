@@ -1,5 +1,5 @@
 {
-  "name": "button-network",
+  "name": "component",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -20,5 +20,7 @@
   "devDependencies": {
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.4"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }

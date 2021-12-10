@@ -1,85 +1,87 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { Button, Box, Heading } from "@chakra-ui/react";
 
-const Message = ({ text, checkNetwork }) => {
+const Message = ({ text }) => {
   return (
     <Box>
-      <Heading>No tenes instalado Metamask</Heading>
+      <Heading>{text}</Heading>
     </Box>
   );
 };
 
-const ButtonAdd = () => {
-  const [chainId, setChainId] = useState(null);
+const ButtonCustom = () => {
+  const [customChain, setCustomChain] = useState(null);
   const [id, setId] = useState(null);
+  const [error, setError] = useState(false);
 
-  const netWork = async () => {
-    const provider = await new ethers.providers.Web3Provider(window.ethereum);
-    const getAddress = await provider.send("eth_requestAccounts", []);
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const network = provider.getNetwork();
 
-    const network = provider.getNetwork();
+  const addChain = async (params) => {
+    try {
+      const getAddress = await provider.send("eth_requestAccounts", []);
 
-    network
-      .then((result) => {
-        setId({
-          chainId: result.chainId,
-          address: getAddress[0],
-          network: result.name
+      await signer.provider.send("wallet_addEthereumChain", [
+        {
+          chainId: "0x64", // esto esta harco la info tiene que ser dinamica
+          chainName: "xDai",
+          nativeCurrency: {
+            name: "xDai",
+            symbol: "xDai",
+            decimals: 18
+          },
+          rpcUrls: ["https://rpc.xdaichain.com/"]
+        }
+      ]);
+
+      network
+        .then((result) => {
+          setId({
+            chainId: result.chainId,
+            address: getAddress[0],
+            network: result.name
+          });
+        })
+        .catch((err) => {
+          console.log("Message Error >>> ", err);
         });
-      })
-      .catch((err) => {
-        console.log("Message Error >>> ", err);
-      });
+
+      console.log(`Switch to ${params[0].chainName}`);
+      setCustomChain(params[0]);
+    } catch (err) {
+      setError(true);
+    }
   };
 
-  const addNetwork = (params) => {
-    window.ethereum
-      .request({
-        method: "wallet_addEthereumChain",
-        params
-      })
-      .then(() => {
-        console.log(`Switch to ${params[0].chainName}`);
-        setChainId(parseInt(params[0].chainId));
-      })
-      .catch((err) => {
-        console.log("Message Error >>> ", err);
-      });
-  };
-
-  const addPolygon = async (e) => {
-    await netWork();
-    await addNetwork([
-      {
-        chainId: "0x64", // esto esta harco la info tiene que ser dinamica
-        chainName: "xDai",
-        nativeCurrency: {
-          name: "xDai",
-          symbol: "xDai",
-          decimals: 18
-        },
-        rpcUrls: ["https://rpc.xdaichain.com/"]
-      }
-    ]);
-  };
+  useEffect(() => {
+    if (!signer) {
+      setError(true);
+    }
+    setError(false);
+    //setId(network);
+  }, []);
 
   return (
     <div>
-      <Box p={25}>
-        {chainId && (
+      {!error ? (
+        <Box p={25}>
           <div>
-            <p>ChainId: {id?.chainId} </p>
-            <p>Name Network: {id?.network} </p>
+            <p>ChainId: {parseInt(customChain?.chainId) || id?.chainId} </p>
+            <p>Name Network: {customChain?.chainName || id?.network} </p>
             <p>My Address: {id?.address} </p>
           </div>
-        )}
-        <Button colorScheme="blue" onClick={addPolygon}>
-          Add xDai Network
-        </Button>
-      </Box>
+          <br />
+          <Button colorScheme="blue" onClick={addChain}>
+            Add xDai Network
+          </Button>
+        </Box>
+      ) : (
+        <Message text="errorrr" />
+      )}
     </div>
   );
 };
 
-export default ButtonAdd;
+export default ButtonCustom;

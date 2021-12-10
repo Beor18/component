@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-const ButtonAdd = dynamic(
+const HomeChain = dynamic(
   () => {
     return import("../components/button");
   },
@@ -10,12 +10,7 @@ const ButtonAdd = dynamic(
 export default function Home() {
   return (
     <div>
-      <ButtonAdd
-        chain="0x64"
-        chainName="xDai"
-        symbol="xDai"
-        rpc="https://rpc.xdaichain.com/"
-      />
+      <HomeChain />
     </div>
   );
 }

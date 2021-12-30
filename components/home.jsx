@@ -10,17 +10,19 @@ const Message = ({ text }) => {
   );
 };
 
+// NO SEAN GATOS! NI AUTH0 IMPLEMENTO ESTA SOLUCIÓN EN SU DEMO LOGIN WEB3! 
+// ME ESTAN HACIENDO LIBERAR UN CÓDIGO QUE LA VA A REE PEGAR EN EL MERCADO!
+// TODO POR NACHO QUE QUIERE LOS REPOS PUBLICOS JAJAJAJA
+
 const Home = () => {
   const [customChain, setCustomChain] = useState(null);
   const [id, setId] = useState(null);
   const [error, setError] = useState(false);
 
-  const netWork = async (params) => {
+  const netWork = async () => {
     try {
       const provider = await new ethers.providers.Web3Provider(window.ethereum);
       const getAddress = await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      console.log("signer >>> ", signer);
       const network = provider.getNetwork();
 
       network
